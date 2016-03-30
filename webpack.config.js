@@ -18,7 +18,7 @@ if (!debug) {
 }
 plugins.push(new webpack.BannerPlugin('jsqrcode v' + pkg.version + ', (c) 2016 ' + pkg.author +
     ', fork of https://github.com/LazarSoft/jsqrcode, port of http://code.google.com/p/zxing' +
-    ', opensource.org/licenses/' + pkg.license));
+    ', http://opensource.org/licenses/' + pkg.license));
 
 module.exports = {
     context: path.join(__dirname, './src'),
