@@ -14,3 +14,7 @@ JavaScript QRCode reader for HTML5 enabled browser.
 This is a port of ZXing qrcode scanner, http://code.google.com/p/zxing.  
 
 Usage examples are in test folder.
+
+# License
+
+Apache 2.0
