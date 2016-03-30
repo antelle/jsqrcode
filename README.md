@@ -1,3 +1,11 @@
+# jsqrcode
+
+Just another fork of jsqrcode
+
+---
+
+# Warning: WIP, don't use it for now, deep under construction
+
 This is a fork of Lazar Laszlo's QRCode reader built with webpack.  
 
 JavaScript QRCode reader for HTML5 enabled browser.  
