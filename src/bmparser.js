@@ -1,5 +1,5 @@
 /*
- Ported to JavaScript by Lazar Laszlo 2011 
+ Ported to JavaScript by Lazar Laszlo 2011
 
  lazarsoft@gmail.com, www.lazarsoft.info
 
@@ -39,7 +39,7 @@ function BitMatrixParser(bitMatrix) {
     this.parsedFormatInfo = null;
 
     this.copyBit = function (i, j, versionBits) {
-        return this.bitMatrix.get_Renamed(i, j) ? (versionBits << 1) | 0x1 : versionBits << 1;
+        return this.bitMatrix.getRenamed(i, j) ? (versionBits << 1) | 0x1 : versionBits << 1;
     };
 
     this.readFormatInformation = function () {
@@ -156,11 +156,11 @@ function BitMatrixParser(bitMatrix) {
                 var i = readingUp ? dimension - 1 - count : count;
                 for (var col = 0; col < 2; col++) {
                     // Ignore bits covered by the function pattern
-                    if (!functionPattern.get_Renamed(j - col, i)) {
+                    if (!functionPattern.getRenamed(j - col, i)) {
                         // Read a bit
                         bitsRead++;
                         currentByte <<= 1;
-                        if (this.bitMatrix.get_Renamed(j - col, i)) {
+                        if (this.bitMatrix.getRenamed(j - col, i)) {
                             currentByte |= 1;
                         }
                         // If we've made a whole byte, save it off

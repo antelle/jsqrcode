@@ -1,5 +1,5 @@
 /*
- Ported to JavaScript by Lazar Laszlo 2011 
+ Ported to JavaScript by Lazar Laszlo 2011
 
  lazarsoft@gmail.com, www.lazarsoft.info
 
@@ -38,9 +38,8 @@ function DataBlock(numDataCodewords, codewords) {
 }
 
 DataBlock.getDataBlocks = function (rawCodewords, version, ecLevel) {
-
     if (rawCodewords.length !== version.TotalCodewords) {
-        throw "ArgumentException";
+        throw 'ArgumentException';
     }
 
     // Figure out the number and size of data blocks used by this version and

@@ -1,5 +1,5 @@
 /*
- Ported to JavaScript by Lazar Laszlo 2011 
+ Ported to JavaScript by Lazar Laszlo 2011
 
  lazarsoft@gmail.com, www.lazarsoft.info
 
@@ -136,7 +136,6 @@ function FinderPatternFinder() {
     this.possibleCenters = [];
     this.hasSkipped = false;
     this.crossCheckStateCount = new Array(0, 0, 0, 0, 0);
-    this.resultPointCallback = null;
 
     this.__defineGetter__("CrossCheckStateCount", function () {
         this.crossCheckStateCount[0] = 0;
@@ -315,9 +314,6 @@ function FinderPatternFinder() {
                 if (!found) {
                     var point = new FinderPattern(centerJ, centerI, estimatedModuleSize);
                     this.possibleCenters.push(point);
-                    if (this.resultPointCallback) {
-                        this.resultPointCallback.foundPossibleResultPoint(point);
-                    }
                 }
                 return true;
             }

@@ -1,5 +1,5 @@
 /*
- Ported to JavaScript by Lazar Laszlo 2011 
+ Ported to JavaScript by Lazar Laszlo 2011
 
  lazarsoft@gmail.com, www.lazarsoft.info
 
@@ -73,9 +73,9 @@ function QRCodeDataBlockReader(blocks, version, numErrorCorrectionCode) {
             // next word crosses 3 data blocks
             mask1 = 0; // mask of first block
             var mask3 = 0; // mask of 3rd block
-            //bitPointer + 1 : number of bits of the 1st block
-            //8 : number of the 2nd block (note that use already 8bits because next word uses 3 data blocks)
-            //numBits - (bitPointer + 1 + 8) : number of bits of the 3rd block 
+            // bitPointer + 1 : number of bits of the 1st block
+            // 8 : number of the 2nd block (note that use already 8bits because next word uses 3 data blocks)
+            // numBits - (bitPointer + 1 + 8) : number of bits of the 3rd block
             for (i = 0; i < this.bitPointer + 1; i++) {
                 mask1 += (1 << i);
             }
@@ -97,17 +97,15 @@ function QRCodeDataBlockReader(blocks, version, numErrorCorrectionCode) {
                 this.bitPointer = 8 + this.bitPointer;
             }
             return bits;
-        }
-        else {
+        } else {
             return 0;
         }
     };
     this.NextMode = function () {
         if ((this.blockPointer > this.blocks.length - this.numErrorCorrectionCode - 2)) {
             return 0;
-        } else {
-            return this.getNextBits(4);
         }
+        return this.getNextBits(4);
     };
     this.getDataLength = function (modeIndicator) {
         var index = 0;
@@ -123,10 +121,11 @@ function QRCodeDataBlockReader(blocks, version, numErrorCorrectionCode) {
     this.getRomanAndFigureString = function (dataLength) {
         var length = dataLength;
         var intData = 0;
-        var strData = "";
-        var tableRomanAndFigure = new Array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', '$', '%', '*', '+', '-', '.', '/', ':');
-        do
-        {
+        var strData = '';
+        var tableRomanAndFigure = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+            'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            ' ', '$', '%', '*', '+', '-', '.', '/', ':'];
+        do {
             if (length > 1) {
                 intData = this.getNextBits(11);
                 var firstLetter = Math.floor(intData / 45);
@@ -140,41 +139,36 @@ function QRCodeDataBlockReader(blocks, version, numErrorCorrectionCode) {
                 strData += tableRomanAndFigure[intData];
                 length -= 1;
             }
-        }
-        while (length > 0);
+        } while (length > 0);
 
         return strData;
     };
     this.getFigureString = function (dataLength) {
         var length = dataLength;
         var intData = 0;
-        var strData = "";
-        do
-        {
+        var strData = '';
+        do {
             if (length >= 3) {
                 intData = this.getNextBits(10);
                 if (intData < 100) {
-                    strData += "0";
+                    strData += '0';
                 }
                 if (intData < 10) {
-                    strData += "0";
+                    strData += '0';
                 }
                 length -= 3;
-            }
-            else if (length === 2) {
+            } else if (length === 2) {
                 intData = this.getNextBits(7);
                 if (intData < 10) {
-                    strData += "0";
+                    strData += '0';
                 }
                 length -= 2;
-            }
-            else if (length === 1) {
+            } else if (length === 1) {
                 intData = this.getNextBits(4);
                 length -= 1;
             }
             strData += intData;
-        }
-        while (length > 0);
+        } while (length > 0);
 
         return strData;
     };
@@ -183,21 +177,18 @@ function QRCodeDataBlockReader(blocks, version, numErrorCorrectionCode) {
         var intData = 0;
         var output = [];
 
-        do
-        {
+        do {
             intData = this.getNextBits(8);
             output.push(intData);
             length--;
-        }
-        while (length > 0);
+        } while (length > 0);
         return output;
     };
     this.getKanjiString = function (dataLength) {
         var length = dataLength;
         var intData = 0;
-        var unicodeString = "";
-        do
-        {
+        var unicodeString = '';
+        do {
             intData = this.getNextBits(13);
             var lowerByte = intData % 0xC0;
             var higherByte = intData / 0xC0;
@@ -207,16 +198,15 @@ function QRCodeDataBlockReader(blocks, version, numErrorCorrectionCode) {
             if (tempWord + 0x8140 <= 0x9FFC) {
                 // between 8140 - 9FFC on Shift_JIS character set
                 shiftjisWord = tempWord + 0x8140;
-            }
-            else {
+            } else {
                 // between E040 - EBBF on Shift_JIS character set
                 shiftjisWord = tempWord + 0xC140;
             }
 
-            //var tempByte = new Array(0,0);
-            //tempByte[0] = (sbyte) (shiftjisWord >> 8);
-            //tempByte[1] = (sbyte) (shiftjisWord & 0xFF);
-            //unicodeString += new String(SystemUtils.ToCharArray(SystemUtils.ToByteArray(tempByte)));
+            // var tempByte = new Array(0,0);
+            // tempByte[0] = (sbyte) (shiftjisWord >> 8);
+            // tempByte[1] = (sbyte) (shiftjisWord & 0xFF);
+            // unicodeString += new String(SystemUtils.ToCharArray(SystemUtils.ToByteArray(tempByte)));
             unicodeString += String.fromCharCode(shiftjisWord);
             length--;
         }
@@ -232,50 +222,48 @@ function QRCodeDataBlockReader(blocks, version, numErrorCorrectionCode) {
         var MODE_ROMAN_AND_NUMBER = 2;
         var MODE_8BIT_BYTE = 4;
         var MODE_KANJI = 8;
-        do
-        {
+        do {
             var mode = this.NextMode();
-            //canvas.println("mode: " + mode);
+            // canvas.println("mode: " + mode);
             if (mode === 0) {
                 if (output.length > 0) {
                     break;
                 } else {
-                    throw "Empty data block";
+                    throw 'Empty data block';
                 }
             }
-            //if (mode != 1 && mode != 2 && mode != 4 && mode != 8)
-            //	break;
-            //}
+            // if (mode != 1 && mode != 2 && mode != 4 && mode != 8)
+            //  break;
+            // }
             if (mode !== MODE_NUMBER && mode !== MODE_ROMAN_AND_NUMBER && mode !== MODE_8BIT_BYTE && mode !== MODE_KANJI) {
-                /*canvas.println("Invalid mode: " + mode);
-                 mode = guessMode(mode);
-                 canvas.println("Guessed mode: " + mode); */
-                throw "Invalid mode: " + mode + " in (block:" + this.blockPointer + " bit:" + this.bitPointer + ")";
+                // /*canvas.println("Invalid mode: " + mode);
+                //  mode = guessMode(mode);
+                //  canvas.println("Guessed mode: " + mode); */
+                throw 'Invalid mode: ' + mode + ' in (block:' + this.blockPointer + ' bit:' + this.bitPointer + ')';
             }
             var dataLength = this.getDataLength(mode);
             if (dataLength < 1) {
-                throw "Invalid data length: " + dataLength;
+                throw 'Invalid data length: ' + dataLength;
             }
-            var temp_str, ta;
-            //canvas.println("length: " + dataLength);
+            var tempStr, ta;
+            // canvas.println("length: " + dataLength);
             switch (mode) {
-
                 case MODE_NUMBER:
-                    //canvas.println("Mode: Figure");
-                    temp_str = this.getFigureString(dataLength);
-                    ta = new Array(temp_str.length);
-                    for (var j = 0; j < temp_str.length; j++) {
-                        ta[j] = temp_str.charCodeAt(j);
+                    // canvas.println("Mode: Figure");
+                    tempStr = this.getFigureString(dataLength);
+                    ta = new Array(tempStr.length);
+                    for (var j = 0; j < tempStr.length; j++) {
+                        ta[j] = tempStr.charCodeAt(j);
                     }
                     output.push(ta);
                     break;
 
                 case MODE_ROMAN_AND_NUMBER:
                     //canvas.println("Mode: Roman&Figure");
-                    temp_str = this.getRomanAndFigureString(dataLength);
-                    ta = new Array(temp_str.length);
-                    for (j = 0; j < temp_str.length; j++) {
-                        ta[j] = temp_str.charCodeAt(j);
+                    tempStr = this.getRomanAndFigureString(dataLength);
+                    ta = new Array(tempStr.length);
+                    for (j = 0; j < tempStr.length; j++) {
+                        ta[j] = tempStr.charCodeAt(j);
                     }
                     output.push(ta);
                     //output.Write(SystemUtils.ToByteArray(temp_sbyteArray2), 0, temp_sbyteArray2.Length);
@@ -294,12 +282,12 @@ function QRCodeDataBlockReader(blocks, version, numErrorCorrectionCode) {
                     //sbyte[] temp_sbyteArray4;
                     //temp_sbyteArray4 = SystemUtils.ToSByteArray(SystemUtils.ToByteArray(getKanjiString(dataLength)));
                     //output.Write(SystemUtils.ToByteArray(temp_sbyteArray4), 0, temp_sbyteArray4.Length);
-                    temp_str = this.getKanjiString(dataLength);
-                    output.push(temp_str);
+                    tempStr = this.getKanjiString(dataLength);
+                    output.push(tempStr);
                     break;
             }
-            //canvas.println("DataLength: " + dataLength);
-            //Console.out.println(dataString);
+            // canvas.println("DataLength: " + dataLength);
+            // Console.out.println(dataString);
         }
         while (true);
         return output;

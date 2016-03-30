@@ -109,7 +109,7 @@ GridSampler.sampleGrid3 = function (image, dimension, transform) {
                 image.imagedata.data[xpoint + 3] = 255;
                 //bits[x >> 1][ y]=bit;
                 if (bit) {
-                    bits.set_Renamed(x >> 1, y);
+                    bits.setRenamed(x >> 1, y);
                 }
             }
         }

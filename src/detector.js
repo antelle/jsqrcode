@@ -38,7 +38,6 @@ function DetectorResult(bits, points) {
 
 function Detector(image) {
     this.image = image;
-    this.resultPointCallback = null;
 
     this.sizeOfBlackWhiteBlackRun = function (fromX, fromY, toX, toY) {
         // Mild variant of Bresenham's algorithm;
@@ -190,7 +189,7 @@ function Detector(image) {
         var alignmentAreaTopY = Math.max(0, estAlignmentY - allowance);
         var alignmentAreaBottomY = Math.min(image.height - 1, estAlignmentY + allowance);
 
-        var alignmentFinder = new AlignmentPatternFinder(this.image, alignmentAreaLeftX, alignmentAreaTopY, alignmentAreaRightX - alignmentAreaLeftX, alignmentAreaBottomY - alignmentAreaTopY, overallEstModuleSize, this.resultPointCallback);
+        var alignmentFinder = new AlignmentPatternFinder(this.image, alignmentAreaLeftX, alignmentAreaTopY, alignmentAreaRightX - alignmentAreaLeftX, alignmentAreaBottomY - alignmentAreaTopY, overallEstModuleSize);
         return alignmentFinder.find();
     };
 

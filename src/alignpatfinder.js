@@ -26,23 +26,19 @@
 
 var AlignmentPattern = require('./alignpat');
 
-function AlignmentPatternFinder(image, startX, startY, width, height, moduleSize, resultPointCallback) {
+function AlignmentPatternFinder(image, startX, startY, width, height, moduleSize) {
     this.image = image;
     this.possibleCenters = [];
-    this.startX = startX;
-    this.startY = startY;
     this.width = width;
     this.height = height;
     this.moduleSize = moduleSize;
     this.crossCheckStateCount = [0, 0, 0];
-    this.resultPointCallback = resultPointCallback;
 
     this.centerFromEnd = function (stateCount, end) {
         return (end - stateCount[2]) - stateCount[1] / 2.0;
     };
     this.foundPatternCross = function (stateCount) {
-        var moduleSize = this.moduleSize;
-        var maxVariance = moduleSize / 2.0;
+        var maxVariance = this.moduleSize / 2.0;
         for (var i = 0; i < 3; i++) {
             if (Math.abs(moduleSize - stateCount[i]) >= maxVariance) {
                 return false;
@@ -52,8 +48,6 @@ function AlignmentPatternFinder(image, startX, startY, width, height, moduleSize
     };
 
     this.crossCheckVertical = function (startI, centerJ, maxCount, originalStateCountTotal) {
-        var image = this.image;
-
         var maxI = image.height;
         var stateCount = this.crossCheckStateCount;
         stateCount[0] = 0;
@@ -120,16 +114,11 @@ function AlignmentPatternFinder(image, startX, startY, width, height, moduleSize
             // Hadn't found this before; save it
             var point = new AlignmentPattern(centerJ, centerI, estimatedModuleSize);
             this.possibleCenters.push(point);
-            if (this.resultPointCallback) {
-                this.resultPointCallback.foundPossibleResultPoint(point);
-            }
         }
         return null;
     };
 
     this.find = function () {
-        var startX = this.startX;
-        var height = this.height;
         var maxJ = startX + width;
         var middleI = startY + (height >> 1);
         // We are looking for black/white/black modules in 1:1:1 ratio;
@@ -199,9 +188,8 @@ function AlignmentPatternFinder(image, startX, startY, width, height, moduleSize
             return this.possibleCenters[0];
         }
 
-        throw "Couldn't find enough alignment patterns";
+        throw 'Couldn\'t find enough alignment patterns';
     };
-
 }
 
 module.exports = AlignmentPatternFinder;
