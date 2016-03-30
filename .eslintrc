@@ -1,0 +1,24 @@
+{
+    "extends": ["strict/es5", "strict/browser"],
+    "rules": {
+        "indent": ["error", 4 ],
+        "func-names": 0,
+        "id-length": 0,
+        "array-bracket-spacing": 0,
+        "no-magic-numbers": 0,
+        "complexity": 0,
+        "init-declarations": 0,
+        "no-throw-literal": 0,
+        "newline-after-var": 0,
+        "max-params": [2, 10],
+        "comma-dangle": [2, "never"],
+        "id-blacklist": 0,
+        "one-var": 0,
+        "no-sync": 0,
+        "space-before-function-paren": 0,
+        "no-empty-function": 0,
+        "no-use-before-define": 0,
+        "id-match": 0,
+        "one-var-declaration-per-line": 0
+    }
+}

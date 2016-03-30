@@ -1,0 +1,11 @@
+workspace.xml
+misc.xml
+.idea/
+.DS_Store
+node_modules/
+bower_components/
+*.log
+dist/
+tmp/
+build/
+coverage/

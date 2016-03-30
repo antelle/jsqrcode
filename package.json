@@ -1,0 +1,41 @@
+{
+  "name": "jsqrcode",
+  "version": "1.0.0",
+  "description": "Fork of LazarSoft's jsqrcode",
+  "main": "out/jsqrcode.min.js",
+  "scripts": {
+    "start": "npm run clean && npm test && npm run build",
+    "clean": "rimraf dist && rimraf tests/build",
+    "build": "npm run build:dev && npm run build:pro",
+    "build:pro": "webpack --progress --colors",
+    "build:dev": "webpack --progress --colors --debug",
+    "build:tests": "webpack --progress --colors --debug --config tests/webpack.config.tests.js",
+    "pretest": "npm run build:tests",
+    "test": "mocha-phantomjs tests/browser-tests.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://antelle@github.com/antelle/jsqrcode.git"
+  },
+  "keywords": [
+    "jsqrcode"
+  ],
+  "author": "Antelle",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/antelle/jsqrcode/issues"
+  },
+  "homepage": "https://github.com/antelle/jsqrcode#readme",
+  "devDependencies": {
+    "eslint": "^2.5.3",
+    "eslint-config-strict": "^8.5.0",
+    "eslint-loader": "^1.3.0",
+    "expect.js": "^0.3.1",
+    "fs-walk": "0.0.1",
+    "mocha": "^2.4.5",
+    "mocha-phantomjs": "^4.0.2",
+    "rimraf": "^2.5.2",
+    "uglify-loader": "^1.3.0",
+    "webpack": "^1.12.14"
+  }
+}
