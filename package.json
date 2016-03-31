@@ -2,7 +2,7 @@
   "name": "jsqrcode",
   "version": "0.1.0",
   "description": "Fork of LazarSoft's jsqrcode",
-  "main": "out/jsqrcode.min.js",
+  "main": "dist/qrcode.min.js",
   "scripts": {
     "start": "npm run clean && npm test && npm run build",
     "clean": "rimraf dist && rimraf tests/build",

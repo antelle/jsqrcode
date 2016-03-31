@@ -1,0 +1,22 @@
+{
+  "name": "jsqrcode",
+  "description": "Fork of LazarSoft's jsqrcode",
+  "main": "dist/qrcode.min.js",
+  "authors": [
+    "Antelle"
+  ],
+  "license": "Apache-2.0",
+  "keywords": [
+    "jsqrcode"
+  ],
+  "homepage": "https://github.com/antelle/jsqrcode",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
