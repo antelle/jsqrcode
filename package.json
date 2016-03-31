@@ -1,6 +1,6 @@
 {
   "name": "jsqrcode",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Fork of LazarSoft's jsqrcode",
   "main": "out/jsqrcode.min.js",
   "scripts": {

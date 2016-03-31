@@ -1,4 +1,4 @@
-/*! jsqrcode v1.0.0, (c) 2016 Antelle, fork of https://github.com/LazarSoft/jsqrcode, port of http://code.google.com/p/zxing, http://opensource.org/licenses/Apache-2.0 */
+/*! jsqrcode v0.1.0, (c) 2016 Antelle, fork of https://github.com/LazarSoft/jsqrcode, port of http://code.google.com/p/zxing, http://opensource.org/licenses/Apache-2.0 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
