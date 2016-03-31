@@ -5,7 +5,6 @@ misc.xml
 node_modules/
 bower_components/
 *.log
-dist/
 tmp/
 build/
 coverage/
