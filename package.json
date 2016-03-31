@@ -7,9 +7,9 @@
     "start": "npm run clean && npm test && npm run build",
     "clean": "rimraf dist && rimraf tests/build",
     "build": "npm run build:dev && npm run build:pro",
-    "build:pro": "webpack --progress --colors",
-    "build:dev": "webpack --progress --colors --debug",
-    "build:tests": "webpack --progress --colors --debug --config tests/webpack.config.tests.js",
+    "build:pro": "webpack --colors",
+    "build:dev": "webpack --colors --debug",
+    "build:tests": "webpack --colors --debug --config tests/webpack.config.tests.js",
     "pretest": "npm run build:tests",
     "test": "mocha-phantomjs tests/browser-tests.html"
   },
