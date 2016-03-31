@@ -25,12 +25,10 @@ In this fork:
 
 ```javascript
 var img = new Image();
-img.src = 'img/' + imgName + (imgName.indexOf('.') < 0 ? '.jpg' : '');
+img.src = 'qr.jpg';
 img.onload = function() {
     var qr = new QrCode(img);
-    var res = qr.decode();
-    expect(res).to.eql(exp);
-    done();
+    var decodedText = qr.decode();
 };
 ```
 
