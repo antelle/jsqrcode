@@ -6,10 +6,8 @@ This is a fork of Lazar Laszlo's QRCode reader built with webpack. The original 
   and other forks didn't work for me well.
 
 JavaScript QRCode reader for HTML5 enabled browser.  
-2011 Lazar Laszlo  http://lazarsoft.info  
-https://github.com/LazarSoft/jsqrcode  
-
-This is a port of ZXing qrcode scanner, https://github.com/zxing/zxing.
+Fork of 2011 [Lazar Laszlo](http://lazarsoft.info): https://github.com/LazarSoft/jsqrcode  
+Which is a port of ZXing qrcode scanner: https://github.com/zxing/zxing.
 
 # Changes
 
