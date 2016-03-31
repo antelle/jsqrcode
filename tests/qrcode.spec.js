@@ -49,6 +49,10 @@ describe('QrCode', function() {
         testCode('totp3.png', 'otpauth://totp/erik?secret=2233445566777733&period=30&digits=6', done);
     });
 
+    it('Parses totp-github QrCode', function(done) {
+        testCode('totp-github.png', 'otpauth://totp/github.com/NewSecureCat?issuer=GitHub&secret=7xqddgdjxkmpju4f', done);
+    });
+
     function testCode(imgName, exp, done) {
         var img = new Image();
         img.src = 'img/' + imgName + (imgName.indexOf('.') < 0 ? '.jpg' : '');
