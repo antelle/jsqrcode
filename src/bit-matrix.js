@@ -24,10 +24,11 @@
 
 'use strict';
 
-var URShift = require('./util').URShift;
+var URShift = require('./utils').URShift;
 
 function BitMatrix(width, height) {
     if (!height) {
+        // noinspection JSSuspiciousNameCombination
         height = width;
     }
     if (width < 1 || height < 1) {
@@ -45,25 +46,19 @@ function BitMatrix(width, height) {
         this.bits[i] = 0;
     }
 
-    this.__defineGetter__("Width", function () {
-        return this.width;
-    });
-    this.__defineGetter__("Height", function () {
-        return this.height;
-    });
-    this.__defineGetter__("Dimension", function () {
+    this.getDimension = function() {
         if (this.width !== this.height) {
-            throw 'Can\'t call getDimension() on a non-square matrix';
+            throw 'Can get dimension on a non-square matrix';
         }
         return this.width;
-    });
+    };
 
-    this.getRenamed = function (x, y) {
+    this.getValue = function (x, y) {
         var offset = y * this.rowSize + (x >> 5);
         return ((URShift(this.bits[offset], (x & 0x1f))) & 1) !== 0;
     };
 
-    this.setRenamed = function (x, y) {
+    this.setValue = function (x, y) {
         var offset = y * this.rowSize + (x >> 5);
         this.bits[offset] |= 1 << (x & 0x1f);
     };

@@ -1,5 +1,5 @@
 /*
- Ported to JavaScript by Lazar Laszlo 2011 
+ Ported to JavaScript by Lazar Laszlo 2011
 
  lazarsoft@gmail.com, www.lazarsoft.info
 
@@ -27,9 +27,9 @@
 var GF256 = require('./gf256').GF256;
 var GF256Poly = require('./gf256').GF256Poly;
 
-
 function ReedSolomonDecoder(field) {
     this.field = field;
+
     this.decode = function (received, twoS) {
         var poly = new GF256Poly(this.field, received);
         var syndromeCoefficients = new Array(twoS);
@@ -37,7 +37,7 @@ function ReedSolomonDecoder(field) {
         for (i = 0; i < syndromeCoefficients.length; i++) {
             syndromeCoefficients[i] = 0;
         }
-        var dataMatrix = false;//this.field.Equals(GF256.DATA_MATRIX_FIELD);
+        var dataMatrix = false;// this.field.Equals(GF256.DATA_MATRIX_FIELD);
         var noError = true;
         for (i = 0; i < twoS; i++) {
             // Thanks to sanfordsquires for this fix:
@@ -59,7 +59,7 @@ function ReedSolomonDecoder(field) {
         for (i = 0; i < errorLocations.length; i++) {
             var position = received.length - 1 - this.field.log(errorLocations[i]);
             if (position < 0) {
-                throw "ReedSolomonException Bad error location";
+                throw 'ReedSolomonException Bad error location';
             }
             received[position] = GF256.addOrSubtract(received[position], errorMagnitudes[i]);
         }
@@ -67,7 +67,7 @@ function ReedSolomonDecoder(field) {
 
     this.runEuclideanAlgorithm = function (a, b, R) {
         // Assume a's degree is >= b's
-        if (a.Degree < b.Degree) {
+        if (a.degree < b.degree) {
             var temp = a;
             a = b;
             b = temp;
@@ -75,13 +75,13 @@ function ReedSolomonDecoder(field) {
 
         var rLast = a;
         var r = b;
-        var sLast = this.field.One;
-        var s = this.field.Zero;
-        var tLast = this.field.Zero;
-        var t = this.field.One;
+        var sLast = this.field.one;
+        var s = this.field.zero;
+        var tLast = this.field.zero;
+        var t = this.field.one;
 
         // Run Euclidean algorithm until r's degree is less than R/2
-        while (r.Degree >= Math.floor(R / 2)) {
+        while (r.degree >= Math.floor(R / 2)) {
             var rLastLast = rLast;
             var sLastLast = sLast;
             var tLastLast = tLast;
@@ -90,20 +90,20 @@ function ReedSolomonDecoder(field) {
             tLast = t;
 
             // Divide rLastLast by rLast, with quotient in q and remainder in r
-            if (rLast.Zero) {
+            if (rLast.zero) {
                 // Oops, Euclidean algorithm already terminated?
-                throw "r_{i-1} was zero";
+                throw 'r_{i-1} was zero';
             }
             r = rLastLast;
-            var q = this.field.Zero;
-            var denominatorLeadingTerm = rLast.getCoefficient(rLast.Degree);
+            var q = this.field.zero;
+            var denominatorLeadingTerm = rLast.getCoefficient(rLast.degree);
             var dltInverse = this.field.inverse(denominatorLeadingTerm);
-            while (r.Degree >= rLast.Degree && !r.Zero) {
-                var degreeDiff = r.Degree - rLast.Degree;
-                var scale = this.field.multiply(r.getCoefficient(r.Degree), dltInverse);
+            while (r.degree >= rLast.degree && !r.zero) {
+                var degreeDiff = r.degree - rLast.degree;
+                var scale = this.field.multiply(r.getCoefficient(r.degree), dltInverse);
                 q = q.addOrSubtract(this.field.buildMonomial(degreeDiff, scale));
                 r = r.addOrSubtract(rLast.multiplyByMonomial(degreeDiff, scale));
-                //r.EXE();
+                // r.EXE();
             }
 
             s = q.multiply1(sLast).addOrSubtract(sLastLast);
@@ -112,17 +112,18 @@ function ReedSolomonDecoder(field) {
 
         var sigmaTildeAtZero = t.getCoefficient(0);
         if (sigmaTildeAtZero === 0) {
-            throw "ReedSolomonException sigmaTilde(0) was zero";
+            throw 'ReedSolomonException sigmaTilde(0) was zero';
         }
 
         var inverse = this.field.inverse(sigmaTildeAtZero);
         var sigma = t.multiply2(inverse);
         var omega = r.multiply2(inverse);
-        return new Array(sigma, omega);
+        return [sigma, omega];
     };
+
     this.findErrorLocations = function (errorLocator) {
         // This is a direct application of Chien's search
-        var numErrors = errorLocator.Degree;
+        var numErrors = errorLocator.degree;
         if (numErrors === 1) {
             // shortcut
             return new Array(errorLocator.getCoefficient(1));
@@ -136,10 +137,11 @@ function ReedSolomonDecoder(field) {
             }
         }
         if (e !== numErrors) {
-            throw "Error locator degree does not match number of roots";
+            throw 'Error locator degree does not match number of roots';
         }
         return result;
     };
+
     this.findErrorMagnitudes = function (errorEvaluator, errorLocations, dataMatrix) {
         // This is directly applying Forney's Formula
         var s = errorLocations.length;

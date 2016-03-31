@@ -63,7 +63,7 @@ function QrCode(image) {
         var qRCodeMatrix = detector.detect();
 
         var reader = Decoder.decode(qRCodeMatrix.bits);
-        var data = reader.DataByte;
+        var data = reader.getDataByte();
         var str = '';
         for (var i = 0; i < data.length; i++) {
             for (var j = 0; j < data[i].length; j++) {

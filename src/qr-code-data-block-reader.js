@@ -101,12 +101,14 @@ function QRCodeDataBlockReader(blocks, version, numErrorCorrectionCode) {
             return 0;
         }
     };
-    this.NextMode = function () {
+
+    this.nextMode = function () {
         if ((this.blockPointer > this.blocks.length - this.numErrorCorrectionCode - 2)) {
             return 0;
         }
         return this.getNextBits(4);
     };
+
     this.getDataLength = function (modeIndicator) {
         var index = 0;
         while (true) {
@@ -118,6 +120,7 @@ function QRCodeDataBlockReader(blocks, version, numErrorCorrectionCode) {
 
         return this.getNextBits(sizeOfDataLengthInfo[this.dataLengthMode][index]);
     };
+
     this.getRomanAndFigureString = function (dataLength) {
         var length = dataLength;
         var intData = 0;
@@ -133,8 +136,7 @@ function QRCodeDataBlockReader(blocks, version, numErrorCorrectionCode) {
                 strData += tableRomanAndFigure[firstLetter];
                 strData += tableRomanAndFigure[secondLetter];
                 length -= 2;
-            }
-            else if (length === 1) {
+            } else if (length === 1) {
                 intData = this.getNextBits(6);
                 strData += tableRomanAndFigure[intData];
                 length -= 1;
@@ -143,6 +145,7 @@ function QRCodeDataBlockReader(blocks, version, numErrorCorrectionCode) {
 
         return strData;
     };
+
     this.getFigureString = function (dataLength) {
         var length = dataLength;
         var intData = 0;
@@ -172,6 +175,7 @@ function QRCodeDataBlockReader(blocks, version, numErrorCorrectionCode) {
 
         return strData;
     };
+
     this.get8bitByteArray = function (dataLength) {
         var length = dataLength;
         var intData = 0;
@@ -184,6 +188,7 @@ function QRCodeDataBlockReader(blocks, version, numErrorCorrectionCode) {
         } while (length > 0);
         return output;
     };
+
     this.getKanjiString = function (dataLength) {
         var length = dataLength;
         var intData = 0;
@@ -216,14 +221,14 @@ function QRCodeDataBlockReader(blocks, version, numErrorCorrectionCode) {
         return unicodeString;
     };
 
-    this.__defineGetter__("DataByte", function () {
+    this.getDataByte = function () {
         var output = [];
         var MODE_NUMBER = 1;
         var MODE_ROMAN_AND_NUMBER = 2;
         var MODE_8BIT_BYTE = 4;
         var MODE_KANJI = 8;
         do {
-            var mode = this.NextMode();
+            var mode = this.nextMode();
             // canvas.println("mode: " + mode);
             if (mode === 0) {
                 if (output.length > 0) {
@@ -259,29 +264,29 @@ function QRCodeDataBlockReader(blocks, version, numErrorCorrectionCode) {
                     break;
 
                 case MODE_ROMAN_AND_NUMBER:
-                    //canvas.println("Mode: Roman&Figure");
+                    // canvas.println("Mode: Roman&Figure");
                     tempStr = this.getRomanAndFigureString(dataLength);
                     ta = new Array(tempStr.length);
                     for (j = 0; j < tempStr.length; j++) {
                         ta[j] = tempStr.charCodeAt(j);
                     }
                     output.push(ta);
-                    //output.Write(SystemUtils.ToByteArray(temp_sbyteArray2), 0, temp_sbyteArray2.Length);
+                    // output.Write(SystemUtils.ToByteArray(temp_sbyteArray2), 0, temp_sbyteArray2.Length);
                     break;
 
                 case MODE_8BIT_BYTE:
-                    //canvas.println("Mode: 8bit Byte");
-                    //sbyte[] temp_sbyteArray3;
-                    var temp_sbyteArray3 = this.get8bitByteArray(dataLength);
-                    output.push(temp_sbyteArray3);
-                    //output.Write(SystemUtils.ToByteArray(temp_sbyteArray3), 0, temp_sbyteArray3.Length);
+                    // canvas.println("Mode: 8bit Byte");
+                    // sbyte[] temp_sbyteArray3;
+                    var tempSBbyteArray3 = this.get8bitByteArray(dataLength);
+                    output.push(tempSBbyteArray3);
+                    // output.Write(SystemUtils.ToByteArray(temp_sbyteArray3), 0, temp_sbyteArray3.Length);
                     break;
 
                 case MODE_KANJI:
-                    //canvas.println("Mode: Kanji");
-                    //sbyte[] temp_sbyteArray4;
-                    //temp_sbyteArray4 = SystemUtils.ToSByteArray(SystemUtils.ToByteArray(getKanjiString(dataLength)));
-                    //output.Write(SystemUtils.ToByteArray(temp_sbyteArray4), 0, temp_sbyteArray4.Length);
+                    // canvas.println("Mode: Kanji");
+                    // sbyte[] temp_sbyteArray4;
+                    // temp_sbyteArray4 = SystemUtils.ToSByteArray(SystemUtils.ToByteArray(getKanjiString(dataLength)));
+                    // output.Write(SystemUtils.ToByteArray(temp_sbyteArray4), 0, temp_sbyteArray4.Length);
                     tempStr = this.getKanjiString(dataLength);
                     output.push(tempStr);
                     break;
@@ -291,7 +296,7 @@ function QRCodeDataBlockReader(blocks, version, numErrorCorrectionCode) {
         }
         while (true);
         return output;
-    });
+    };
 }
 
 module.exports = QRCodeDataBlockReader;

@@ -22,7 +22,7 @@ plugins.push(new webpack.BannerPlugin('jsqrcode v' + pkg.version + ', (c) 2016 '
 
 module.exports = {
     context: path.join(__dirname, './src'),
-    entry: 'qrcode.js',
+    entry: 'qr-code.js',
     output: {
         path: path.join(__dirname, './dist'),
         filename: debug ? 'qrcode.js' : 'qrcode.min.js',
@@ -31,7 +31,7 @@ module.exports = {
     },
     module: {
         loaders: [
-            // { test: /\.js$/, loader: 'eslint-loader', exclude: /node_modules/ }
+            { test: /\.js$/, loader: 'eslint-loader', exclude: /node_modules/ }
         ]
     },
     resolve: {

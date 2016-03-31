@@ -1,5 +1,5 @@
 /*
- Ported to JavaScript by Lazar Laszlo 2011 
+ Ported to JavaScript by Lazar Laszlo 2011
 
  lazarsoft@gmail.com, www.lazarsoft.info
 
@@ -24,12 +24,23 @@
 
 'use strict';
 
-function URShift(number, bits) {
-    if (number >= 0) {
-        return number >> bits;
-    } else {
-        return (number >> bits) + (2 << ~bits);
-    }
+function ErrorCorrectionLevel(ordinal, bits, name) {
+    this.ordinal = ordinal;
+    this.bits = bits;
+    this.name = name;
 }
 
-module.exports = { URShift: URShift };
+ErrorCorrectionLevel.forBits = function (bits) {
+    if (bits < 0 || bits >= FOR_BITS.length) {
+        throw 'ArgumentException';
+    }
+    return FOR_BITS[bits];
+};
+
+var L = new ErrorCorrectionLevel(0, 0x01, 'L');
+var M = new ErrorCorrectionLevel(1, 0x00, 'M');
+var Q = new ErrorCorrectionLevel(2, 0x03, 'Q');
+var H = new ErrorCorrectionLevel(3, 0x02, 'H');
+var FOR_BITS = [M, L, H, Q];
+
+module.exports = ErrorCorrectionLevel;

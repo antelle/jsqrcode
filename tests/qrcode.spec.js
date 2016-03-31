@@ -2,7 +2,7 @@
 
 var expect = require('expect.js');
 
-var QrCode = require('QrCode');
+var QrCode = require('qr-code');
 
 describe('QrCode', function() {
     it('parses QrCode', function(done) {

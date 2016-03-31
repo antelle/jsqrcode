@@ -1,8 +1,6 @@
 # jsqrcode
 
-Just another fork of jsqrcode
-
-### Warning: WIP, don't use it for now, deep under construction
+Yet another fork of jsqrcode for browser.
 
 This is a fork of Lazar Laszlo's QRCode reader built with webpack. The original project is abandoned,
   and other forks didn't work for me well.
@@ -11,9 +9,19 @@ JavaScript QRCode reader for HTML5 enabled browser.
 2011 Lazar Laszlo  http://lazarsoft.info  
 https://github.com/LazarSoft/jsqrcode  
 
-This is a port of ZXing qrcode scanner, https://github.com/zxing/zxing.  
+This is a port of ZXing qrcode scanner, https://github.com/zxing/zxing.
 
-Usage examples are in test folder.
+# Changes
+
+In this fork:
+
+- object-oriented modular API
+- no global variables or monkey patching
+- ESLint-ed code
+- built with webpack, ready to use as module
+- minified and debug builds
+- 40kB total, no dependencies
+- mocha tests
 
 # License
 

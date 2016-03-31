@@ -1,7 +1,7 @@
 {
     "extends": ["strict/es5", "strict/browser"],
     "rules": {
-        "indent": ["error", 4 ],
+        "indent": [2, 4, {"SwitchCase": 1}],
         "func-names": 0,
         "id-length": 0,
         "array-bracket-spacing": 0,
@@ -10,7 +10,7 @@
         "init-declarations": 0,
         "no-throw-literal": 0,
         "newline-after-var": 0,
-        "max-params": [2, 10],
+        "max-params": [2, 20],
         "comma-dangle": [2, "never"],
         "id-blacklist": 0,
         "one-var": 0,
@@ -22,10 +22,15 @@
         "one-var-declaration-per-line": 0,
         "no-bitwise": 0,
         "no-lonely-if": 0,
+        "no-else-return": 0,
         "max-depth": [2, 10],
+        "max-statements": [2, 100],
         "no-inline-comments": 0,
         "max-len": [2, 180],
-        "no-constant-condition": 0
+        "no-constant-condition": 0,
+        "brace-style": [2, "1tbs", { "allowSingleLine": true }],
+        "default-case": 0,
+        "filenames/filenames": 0
     },
     "globals": {
         "module": true

@@ -1,5 +1,5 @@
 /*
- Ported to JavaScript by Lazar Laszlo 2011 
+ Ported to JavaScript by Lazar Laszlo 2011
 
  lazarsoft@gmail.com, www.lazarsoft.info
 
@@ -24,17 +24,16 @@
 
 'use strict';
 
-var AlignmentPatternFinder = require('./alignpatfinder');
-var GridSampler = require('./grid');
+var AlignmentPatternFinder = require('./alignment-pattern-finder');
+var GridSampler = require('./grid-sampler');
 var Version = require('./version');
-var FinderPatternFinder = require('./findpat');
-var PerspectiveTransform = require('./perspt');
+var FinderPatternFinder = require('./finder-pattern-finder');
+var PerspectiveTransform = require('./perspective-transform');
 
 function DetectorResult(bits, points) {
     this.bits = bits;
     this.points = points;
 }
-
 
 function Detector(image) {
     this.image = image;
@@ -59,7 +58,6 @@ function Detector(image) {
         var xstep = fromX < toX ? 1 : -1;
         var state = 0; // In black pixels, looking for white, first or second time
         for (var x = fromX, y = fromY; x !== toX; x += xstep) {
-
             var realX = steep ? y : x;
             var realY = steep ? x : y;
             if (state === 1) {
@@ -67,8 +65,7 @@ function Detector(image) {
                 if (this.image[realX + realY * image.width]) {
                     state++;
                 }
-            }
-            else {
+            } else {
                 if (!this.image[realX + realY * image.width]) {
                     state++;
                 }
@@ -96,7 +93,6 @@ function Detector(image) {
 
 
     this.sizeOfBlackWhiteBlackRunBothWays = function (fromX, fromY, toX, toY) {
-
         var result = this.sizeOfBlackWhiteBlackRun(fromX, fromY, toX, toY);
 
         // Now count other way -- don't run off image though of course
@@ -105,8 +101,7 @@ function Detector(image) {
         if (otherToX < 0) {
             scale = fromX / (fromX - otherToX);
             otherToX = 0;
-        }
-        else if (otherToX >= image.width) {
+        } else if (otherToX >= image.width) {
             scale = (image.width - 1 - fromX) / (otherToX - fromX);
             otherToX = image.width - 1;
         }
@@ -116,8 +111,7 @@ function Detector(image) {
         if (otherToY < 0) {
             scale = fromY / (fromY - otherToY);
             otherToY = 0;
-        }
-        else if (otherToY >= image.height) {
+        } else if (otherToY >= image.height) {
             scale = (image.height - 1 - fromY) / (otherToY - fromY);
             otherToY = image.height - 1;
         }
@@ -129,8 +123,8 @@ function Detector(image) {
 
 
     this.calculateModuleSizeOneWay = function (pattern, otherPattern) {
-        var moduleSizeEst1 = this.sizeOfBlackWhiteBlackRunBothWays(Math.floor(pattern.X), Math.floor(pattern.Y), Math.floor(otherPattern.X), Math.floor(otherPattern.Y));
-        var moduleSizeEst2 = this.sizeOfBlackWhiteBlackRunBothWays(Math.floor(otherPattern.X), Math.floor(otherPattern.Y), Math.floor(pattern.X), Math.floor(pattern.Y));
+        var moduleSizeEst1 = this.sizeOfBlackWhiteBlackRunBothWays(Math.floor(pattern.x), Math.floor(pattern.y), Math.floor(otherPattern.x), Math.floor(otherPattern.y));
+        var moduleSizeEst2 = this.sizeOfBlackWhiteBlackRunBothWays(Math.floor(otherPattern.x), Math.floor(otherPattern.y), Math.floor(pattern.x), Math.floor(pattern.y));
         if (isNaN(moduleSizeEst1)) {
             return moduleSizeEst2 / 7.0;
         }
@@ -149,29 +143,26 @@ function Detector(image) {
     };
 
     this.distance = function (pattern1, pattern2) {
-        var xDiff = pattern1.X - pattern2.X;
-        var yDiff = pattern1.Y - pattern2.Y;
+        var xDiff = pattern1.x - pattern2.x;
+        var yDiff = pattern1.y - pattern2.y;
         return Math.sqrt((xDiff * xDiff + yDiff * yDiff));
     };
-    this.computeDimension = function (topLeft, topRight, bottomLeft, moduleSize) {
 
+    this.computeDimension = function (topLeft, topRight, bottomLeft, moduleSize) {
         var tltrCentersDimension = Math.round(this.distance(topLeft, topRight) / moduleSize);
         var tlblCentersDimension = Math.round(this.distance(topLeft, bottomLeft) / moduleSize);
         var dimension = ((tltrCentersDimension + tlblCentersDimension) >> 1) + 7;
         switch (dimension & 0x03) {
-
             // mod 4
             case 0:
                 dimension++;
                 break;
             // 1? do nothing
-
             case 2:
                 dimension--;
                 break;
-
             case 3:
-                throw "Error";
+                throw 'Error';
         }
         return dimension;
     };
@@ -183,13 +174,14 @@ function Detector(image) {
         var alignmentAreaLeftX = Math.max(0, estAlignmentX - allowance);
         var alignmentAreaRightX = Math.min(image.width - 1, estAlignmentX + allowance);
         if (alignmentAreaRightX - alignmentAreaLeftX < overallEstModuleSize * 3) {
-            throw "Error";
+            throw 'Error';
         }
 
         var alignmentAreaTopY = Math.max(0, estAlignmentY - allowance);
         var alignmentAreaBottomY = Math.min(image.height - 1, estAlignmentY + allowance);
 
-        var alignmentFinder = new AlignmentPatternFinder(this.image, alignmentAreaLeftX, alignmentAreaTopY, alignmentAreaRightX - alignmentAreaLeftX, alignmentAreaBottomY - alignmentAreaTopY, overallEstModuleSize);
+        var alignmentFinder = new AlignmentPatternFinder(this.image, alignmentAreaLeftX, alignmentAreaTopY,
+            alignmentAreaRightX - alignmentAreaLeftX, alignmentAreaBottomY - alignmentAreaTopY, overallEstModuleSize);
         return alignmentFinder.find();
     };
 
@@ -200,80 +192,76 @@ function Detector(image) {
         var sourceBottomRightX;
         var sourceBottomRightY;
         if (alignmentPattern) {
-            bottomRightX = alignmentPattern.X;
-            bottomRightY = alignmentPattern.Y;
+            bottomRightX = alignmentPattern.x;
+            bottomRightY = alignmentPattern.y;
             sourceBottomRightX = sourceBottomRightY = dimMinusThree - 3.0;
         } else {
             // Don't have an alignment pattern, just make up the bottom-right point
-            bottomRightX = (topRight.X - topLeft.X) + bottomLeft.X;
-            bottomRightY = (topRight.Y - topLeft.Y) + bottomLeft.Y;
+            bottomRightX = (topRight.x - topLeft.x) + bottomLeft.x;
+            bottomRightY = (topRight.y - topLeft.y) + bottomLeft.y;
             sourceBottomRightX = sourceBottomRightY = dimMinusThree;
         }
 
-        var transform = PerspectiveTransform.quadrilateralToQuadrilateral(3.5, 3.5, dimMinusThree, 3.5, sourceBottomRightX, sourceBottomRightY, 3.5, dimMinusThree, topLeft.X, topLeft.Y, topRight.X, topRight.Y, bottomRightX, bottomRightY, bottomLeft.X, bottomLeft.Y);
-
-        return transform;
+        return PerspectiveTransform.quadrilateralToQuadrilateral(3.5, 3.5, dimMinusThree, 3.5,
+            sourceBottomRightX, sourceBottomRightY, 3.5, dimMinusThree, topLeft.x, topLeft.y, topRight.x, topRight.y,
+            bottomRightX, bottomRightY, bottomLeft.x, bottomLeft.y);
     };
 
-    this.sampleGrid = function (image, transform, dimension) {
-
-        var sampler = GridSampler;
-        return sampler.sampleGrid3(image, dimension, transform);
+    this.sampleGrid = function (transform, dimension) {
+        return GridSampler.sampleGrid3(image, dimension, transform);
     };
 
     this.processFinderPatternInfo = function (info) {
-
-        var topLeft = info.TopLeft;
-        var topRight = info.TopRight;
-        var bottomLeft = info.BottomLeft;
+        var topLeft = info.topLeft;
+        var topRight = info.topRight;
+        var bottomLeft = info.bottomLeft;
 
         var moduleSize = this.calculateModuleSize(topLeft, topRight, bottomLeft);
         if (moduleSize < 1.0) {
-            throw "Error";
+            throw 'Error';
         }
         var dimension = this.computeDimension(topLeft, topRight, bottomLeft, moduleSize);
         var provisionalVersion = Version.getProvisionalVersionForDimension(dimension);
-        var modulesBetweenFPCenters = provisionalVersion.DimensionForVersion - 7;
+        var modulesBetweenFPCenters = provisionalVersion.getDimensionForVersion() - 7;
 
         var alignmentPattern = null;
         // Anything above version 1 has an alignment pattern
-        if (provisionalVersion.AlignmentPatternCenters.length > 0) {
-
+        if (provisionalVersion.alignmentPatternCenters.length > 0) {
             // Guess where a "bottom right" finder pattern would have been
-            var bottomRightX = topRight.X - topLeft.X + bottomLeft.X;
-            var bottomRightY = topRight.Y - topLeft.Y + bottomLeft.Y;
+            var bottomRightX = topRight.x - topLeft.x + bottomLeft.x;
+            var bottomRightY = topRight.y - topLeft.y + bottomLeft.y;
 
             // Estimate that alignment pattern is closer by 3 modules
             // from "bottom right" to known top left location
             var correctionToTopLeft = 1.0 - 3.0 / modulesBetweenFPCenters;
-            var estAlignmentX = Math.floor(topLeft.X + correctionToTopLeft * (bottomRightX - topLeft.X));
-            var estAlignmentY = Math.floor(topLeft.Y + correctionToTopLeft * (bottomRightY - topLeft.Y));
+            var estAlignmentX = Math.floor(topLeft.x + correctionToTopLeft * (bottomRightX - topLeft.x));
+            var estAlignmentY = Math.floor(topLeft.y + correctionToTopLeft * (bottomRightY - topLeft.y));
 
             // Kind of arbitrary -- expand search radius before giving up
+            // noinspection LoopStatementThatDoesntLoopJS
             for (var i = 4; i <= 16; i <<= 1) {
-                //try
-                //{
+                // try
+                // {
                 alignmentPattern = this.findAlignmentInRegion(moduleSize, estAlignmentX, estAlignmentY, i);
                 break;
-                //}
-                //catch (re)
-                //{
+                // }
+                // catch (re)
+                // {
                 // try next round
-                //}
+                // }
             }
             // If we didn't find alignment pattern... well try anyway without it
         }
 
         var transform = this.createTransform(topLeft, topRight, bottomLeft, alignmentPattern, dimension);
 
-        var bits = this.sampleGrid(this.image, transform, dimension);
+        var bits = this.sampleGrid(transform, dimension);
 
         var points;
-        if (!alignmentPattern) {
-            points = new Array(bottomLeft, topLeft, topRight);
-        }
-        else {
-            points = new Array(bottomLeft, topLeft, topRight, alignmentPattern);
+        if (alignmentPattern) {
+            points = [bottomLeft, topLeft, topRight, alignmentPattern];
+        } else {
+            points = [bottomLeft, topLeft, topRight];
         }
         return new DetectorResult(bits, points);
     };

@@ -1,5 +1,5 @@
 /*
- Ported to JavaScript by Lazar Laszlo 2011 
+ Ported to JavaScript by Lazar Laszlo 2011
 
  lazarsoft@gmail.com, www.lazarsoft.info
 
@@ -24,11 +24,11 @@
 
 'use strict';
 
-var ReedSolomonDecoder = require('./rsdecoder');
+var ReedSolomonDecoder = require('./reed-solomon-decoder');
 var GF256 = require('./gf256').GF256;
-var BitMatrixParser = require('./bmparser');
-var DataBlock = require('./datablock');
-var QRCodeDataBlockReader = require('./databr');
+var BitMatrixParser = require('./bit-matrix-parser');
+var DataBlock = require('./data-block');
+var QRCodeDataBlockReader = require('./qr-code-data-block-reader');
 
 
 var Decoder = {};
@@ -45,10 +45,9 @@ Decoder.correctErrors = function (codewordBytes, numDataCodewords) {
     var numECCodewords = codewordBytes.length - numDataCodewords;
     try {
         Decoder.rsDecoder.decode(codewordsInts, numECCodewords);
-        //var corrector = new ReedSolomon(codewordsInts, numECCodewords);
-        //corrector.correct();
-    }
-    catch (rse) {
+        // var corrector = new ReedSolomon(codewordsInts, numECCodewords);
+        // corrector.correct();
+    } catch (rse) {
         throw rse;
     }
     // Copy back into array of bytes -- only need to worry about the bytes that were data
@@ -61,7 +60,7 @@ Decoder.correctErrors = function (codewordBytes, numDataCodewords) {
 Decoder.decode = function (bits) {
     var parser = new BitMatrixParser(bits);
     var version = parser.readVersion();
-    var ecLevel = parser.readFormatInformation().ErrorCorrectionLevel;
+    var ecLevel = parser.readFormatInformation().errorCorrectionLevel;
 
     // Read codewords
     var codewords = parser.readCodewords();
@@ -73,7 +72,7 @@ Decoder.decode = function (bits) {
     var totalBytes = 0;
     var i;
     for (i = 0; i < dataBlocks.length; i++) {
-        totalBytes += dataBlocks[i].NumDataCodewords;
+        totalBytes += dataBlocks[i].numDataCodewords;
     }
     var resultBytes = new Array(totalBytes);
     var resultOffset = 0;
@@ -81,8 +80,8 @@ Decoder.decode = function (bits) {
     // Error-correct and copy data blocks together into a stream of bytes
     for (var j = 0; j < dataBlocks.length; j++) {
         var dataBlock = dataBlocks[j];
-        var codewordBytes = dataBlock.Codewords;
-        var numDataCodewords = dataBlock.NumDataCodewords;
+        var codewordBytes = dataBlock.codewords;
+        var numDataCodewords = dataBlock.numDataCodewords;
         Decoder.correctErrors(codewordBytes, numDataCodewords);
         for (i = 0; i < numDataCodewords; i++) {
             resultBytes[resultOffset++] = codewordBytes[i];
@@ -90,8 +89,8 @@ Decoder.decode = function (bits) {
     }
 
     // Decode the contents of that stream of bytes
-    return new QRCodeDataBlockReader(resultBytes, version.VersionNumber, ecLevel.Bits);
-    //return DecodedBitStreamParser.decode(resultBytes, version, ecLevel);
+    return new QRCodeDataBlockReader(resultBytes, version.versionNumber, ecLevel.bits);
+    // return DecodedBitStreamParser.decode(resultBytes, version, ecLevel);
 };
 
 module.exports = Decoder;

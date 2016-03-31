@@ -24,8 +24,8 @@
 
 'use strict';
 
-var BitMatrix = require('./bitmat');
-var PerspectiveTransform = require('./perspt');
+var BitMatrix = require('./bit-matrix');
+var PerspectiveTransform = require('./perspective-transform');
 
 var GridSampler = {};
 
@@ -39,7 +39,7 @@ GridSampler.checkAndNudgePoints = function (image, points) {
         x = Math.floor(points[offset]);
         y = Math.floor(points[offset + 1]);
         if (x < -1 || x > width || y < -1 || y > height) {
-            throw "Error.checkAndNudgePoints ";
+            throw 'Error.checkAndNudgePoints ';
         }
         nudged = false;
         if (x === -1) {
@@ -63,7 +63,7 @@ GridSampler.checkAndNudgePoints = function (image, points) {
         x = Math.floor(points[offset]);
         y = Math.floor(points[offset + 1]);
         if (x < -1 || x > width || y < -1 || y > height) {
-            throw "Error.checkAndNudgePoints ";
+            throw 'Error.checkAndNudgePoints ';
         }
         nudged = false;
         if (x === -1) {
@@ -107,13 +107,12 @@ GridSampler.sampleGrid3 = function (image, dimension, transform) {
                 image.imagedata.data[xpoint + 1] = bit ? 255 : 0;
                 image.imagedata.data[xpoint + 2] = 0;
                 image.imagedata.data[xpoint + 3] = 255;
-                //bits[x >> 1][ y]=bit;
+                // bits[x >> 1][ y]=bit;
                 if (bit) {
-                    bits.setRenamed(x >> 1, y);
+                    bits.setValue(x >> 1, y);
                 }
             }
-        }
-        catch (aioobe) {
+        } catch (aioobe) {
             // This feels wrong, but, sometimes if the finder patterns are misidentified, the resulting
             // transform gets "twisted" such that it maps a straight line of points to a set of points
             // whose endpoints are in bounds, but others are not. There is probably some mathematical
@@ -121,14 +120,16 @@ GridSampler.sampleGrid3 = function (image, dimension, transform) {
             // This results in an ugly runtime exception despite our clever checks above -- can't have
             // that. We could check each point's coordinates but that feels duplicative. We settle for
             // catching and wrapping ArrayIndexOutOfBoundsException.
-            throw "Error.checkAndNudgePoints";
+            throw 'Error.checkAndNudgePoints';
         }
     }
     return bits;
 };
 
-GridSampler.sampleGridx = function (image, dimension, p1ToX, p1ToY, p2ToX, p2ToY, p3ToX, p3ToY, p4ToX, p4ToY, p1FromX, p1FromY, p2FromX, p2FromY, p3FromX, p3FromY, p4FromX, p4FromY) {
-    var transform = PerspectiveTransform.quadrilateralToQuadrilateral(p1ToX, p1ToY, p2ToX, p2ToY, p3ToX, p3ToY, p4ToX, p4ToY, p1FromX, p1FromY, p2FromX, p2FromY, p3FromX, p3FromY, p4FromX, p4FromY);
+GridSampler.sampleGridx = function (image, dimension, p1ToX, p1ToY, p2ToX, p2ToY, p3ToX, p3ToY, p4ToX, p4ToY,
+                                    p1FromX, p1FromY, p2FromX, p2FromY, p3FromX, p3FromY, p4FromX, p4FromY) {
+    var transform = PerspectiveTransform.quadrilateralToQuadrilateral(p1ToX, p1ToY, p2ToX, p2ToY, p3ToX, p3ToY, p4ToX, p4ToY,
+        p1FromX, p1FromY, p2FromX, p2FromY, p3FromX, p3FromY, p4FromX, p4FromY);
 
     return GridSampler.sampleGrid3(image, dimension, transform);
 };

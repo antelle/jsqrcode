@@ -1,5 +1,5 @@
 /*
- Ported to JavaScript by Lazar Laszlo 2011 
+ Ported to JavaScript by Lazar Laszlo 2011
 
  lazarsoft@gmail.com, www.lazarsoft.info
 
@@ -24,13 +24,13 @@
 
 'use strict';
 
-var URShift = require('./util').URShift;
+var URShift = require('./utils').URShift;
 
 var DataMask = {};
 
 DataMask.forReference = function (reference) {
     if (reference < 0 || reference > 7) {
-        throw "System.ArgumentException";
+        throw 'System.ArgumentException';
     }
     return DataMask.DATA_MASKS[reference];
 };
@@ -60,7 +60,7 @@ function DataMask001() {
             }
         }
     };
-    this.isMasked = function (i/*, j*/) {
+    this.isMasked = function (i/* , j*/) {
         return (i & 0x01) === 0;
     };
 }
@@ -156,6 +156,7 @@ function DataMask111() {
     };
 }
 
-DataMask.DATA_MASKS = new Array(new DataMask000(), new DataMask001(), new DataMask010(), new DataMask011(), new DataMask100(), new DataMask101(), new DataMask110(), new DataMask111());
+DataMask.DATA_MASKS = [new DataMask000(), new DataMask001(), new DataMask010(), new DataMask011(),
+    new DataMask100(), new DataMask101(), new DataMask110(), new DataMask111()];
 
 module.exports = DataMask;

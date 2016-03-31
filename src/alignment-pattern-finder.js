@@ -24,7 +24,7 @@
 
 'use strict';
 
-var AlignmentPattern = require('./alignpat');
+var AlignmentPattern = require('./alignment-pattern');
 
 function AlignmentPatternFinder(image, startX, startY, width, height, moduleSize) {
     this.image = image;
@@ -37,6 +37,7 @@ function AlignmentPatternFinder(image, startX, startY, width, height, moduleSize
     this.centerFromEnd = function (stateCount, end) {
         return (end - stateCount[2]) - stateCount[1] / 2.0;
     };
+
     this.foundPatternCross = function (stateCount) {
         var maxVariance = this.moduleSize / 2.0;
         for (var i = 0; i < 3; i++) {
