@@ -21,6 +21,19 @@ In this fork:
 - 40kB total, no dependencies
 - mocha tests
 
+# Usage
+
+```javascript
+var img = new Image();
+img.src = 'img/' + imgName + (imgName.indexOf('.') < 0 ? '.jpg' : '');
+img.onload = function() {
+    var qr = new QrCode(img);
+    var res = qr.decode();
+    expect(res).to.eql(exp);
+    done();
+};
+```
+
 # License
 
 Apache 2.0
