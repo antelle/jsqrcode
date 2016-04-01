@@ -33,6 +33,7 @@
         "filenames/filenames": 0
     },
     "globals": {
-        "module": true
+        "module": true,
+        "Uint8Array": true
     }
 }

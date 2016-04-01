@@ -92,7 +92,7 @@ function QrCode(image) {
                 var min = 0;
                 var max = 0xFF;
                 for (var dy = 0; dy < areaHeight; dy++) {
-                    var baseCoord = areaWidth * ax + (areaHeight * ay + dy) * width
+                    var baseCoord = areaWidth * ax + (areaHeight * ay + dy) * width;
                     for (var dx = 0; dx < areaWidth; dx++) {
                         var target = data[baseCoord + dx];
                         if (target < min) {
@@ -141,7 +141,7 @@ function QrCode(image) {
     }
 
     function grayscale() {
-        var data = imageData.data
+        var data = imageData.data;
         var ret = new Uint8Array(width * height);
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width; x++) {
