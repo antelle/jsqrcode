@@ -41,6 +41,10 @@ describe('QrCode', function() {
         testCode('damaged', 'http://blog.qr4.nl/post/QR-Code-Error-Recovery.aspx', done);
     });
 
+    it('Parses colored QrCode', function(done) {
+        testCode('colored', 'http://freenuts.com/', done);
+    });
+
     it('Parses options QrCode', function(done) {
         testCode('options.png', 'http://example.com', done);
     });
