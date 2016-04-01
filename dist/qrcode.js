@@ -1,4 +1,4 @@
-/*! jsqrcode v0.1.0, (c) 2016 Antelle, fork of https://github.com/LazarSoft/jsqrcode, port of http://code.google.com/p/zxing, http://opensource.org/licenses/Apache-2.0 */
+/*! jsqrcode v0.1.1, (c) 2016 Antelle, fork of https://github.com/LazarSoft/jsqrcode, port of http://code.google.com/p/zxing, http://opensource.org/licenses/Apache-2.0 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -131,15 +131,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return str;
 	    }
 
-	    function getPixel(x, y) {
-	        if (width < x || height < y) {
-	            throw 'point error';
-	        }
-	        var point = (x * 4) + (y * width * 4);
-	        return (imageData.data[point] * 33 + imageData.data[point + 1] * 34 + imageData.data[point + 2] * 33) / 100;
-	    }
-
-	    function getMiddleBrightnessPerArea() {
+	    function getMiddleBrightnessPerArea(data) {
 	        var numSqrtArea = 4;
 	        // obtain middle brightness((min + max) / 2) per area
 	        var areaWidth = Math.floor(width / numSqrtArea);
@@ -154,18 +146,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var ax, ay;
 	        for (ay = 0; ay < numSqrtArea; ay++) {
 	            for (ax = 0; ax < numSqrtArea; ax++) {
-	                minmax[ax][ay][0] = 0xFF;
+	                var min = 0;
+	                var max = 0xFF;
 	                for (var dy = 0; dy < areaHeight; dy++) {
+	                    var baseCoord = areaWidth * ax + (areaHeight * ay + dy) * width;
 	                    for (var dx = 0; dx < areaWidth; dx++) {
-	                        var target = image[areaWidth * ax + dx + (areaHeight * ay + dy) * width];
-	                        if (target < minmax[ax][ay][0]) {
-	                            minmax[ax][ay][0] = target;
+	                        var target = data[baseCoord + dx];
+	                        if (target < min) {
+	                            min = target;
 	                        }
-	                        if (target > minmax[ax][ay][1]) {
-	                            minmax[ax][ay][1] = target;
+	                        if (target > max) {
+	                            max = target;
 	                        }
 	                    }
 	                }
+	                minmax[ax][ay][0] = min;
+	                minmax[ax][ay][1] = max;
 	                // minmax[ax][ay][0] = (minmax[ax][ay][0] + minmax[ax][ay][1]) / 2;
 	            }
 	        }
@@ -178,7 +174,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                middle[ax][ay] = Math.floor((minmax[ax][ay][0] + minmax[ax][ay][1]) / 2);
 	            }
 	        }
-
 	        return middle;
 	    }
 
@@ -187,7 +182,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var sqrtNumArea = middle.length;
 	        var areaWidth = Math.floor(width / sqrtNumArea);
 	        var areaHeight = Math.floor(height / sqrtNumArea);
-	        var bitmap = new Array(height * width);
+	        var bitmap = new Uint8Array(height * width);
 
 	        for (var ay = 0; ay < sqrtNumArea; ay++) {
 	            for (var ax = 0; ax < sqrtNumArea; ax++) {
@@ -203,10 +198,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    function grayscale() {
-	        var ret = new Array(width * height);
+	        var data = imageData.data;
+	        var ret = new Uint8Array(width * height);
 	        for (var y = 0; y < height; y++) {
 	            for (var x = 0; x < width; x++) {
-	                ret[x + y * width] = getPixel(x, y);
+	                var point = (x * 4) + (y * width * 4);
+	                ret[x + y * width] = (data[point] * 33 + data[point + 1] * 34 + data[point + 2] * 33) / 100;
 	            }
 	        }
 	        return ret;
