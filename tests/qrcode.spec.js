@@ -33,6 +33,14 @@ describe('QrCode', function() {
         testCode('screenshot', 'http://goQR.me', done);
     });
 
+    it('Parses art QrCode', function(done) {
+        testCode('art', 'http://en.WIKIPEDIA.ORG', done);
+    });
+
+    it('Parses damaged QrCode', function(done) {
+        testCode('damaged', 'http://blog.qr4.nl/post/QR-Code-Error-Recovery.aspx', done);
+    });
+
     it('Parses options QrCode', function(done) {
         testCode('options.png', 'http://example.com', done);
     });
