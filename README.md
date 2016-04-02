@@ -1,4 +1,4 @@
-# jsqrcode
+# jsqrcode [![Build status](https://travis-ci.org/antelle/jsqrcode.svg?branch=master)](https://travis-ci.org/antelle/jsqrcode)
 
 Yet another fork of jsqrcode for browser.
 
