@@ -41,10 +41,7 @@ function BitMatrix(width, height) {
         rowSize++;
     }
     this.rowSize = rowSize;
-    this.bits = new Array(rowSize * height);
-    for (var i = 0; i < this.bits.length; i++) {
-        this.bits[i] = 0;
-    }
+    this.bits = new Uint32Array(rowSize * height);
 
     this.getDimension = function() {
         if (this.width !== this.height) {
