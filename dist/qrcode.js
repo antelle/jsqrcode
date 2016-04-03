@@ -1,4 +1,4 @@
-/*! jsqrcode v0.1.1, (c) 2016 Antelle, fork of https://github.com/LazarSoft/jsqrcode, port of http://code.google.com/p/zxing, http://opensource.org/licenses/Apache-2.0 */
+/*! jsqrcode v0.1.2, (c) 2016 Antelle, fork of https://github.com/LazarSoft/jsqrcode, port of http://code.google.com/p/zxing, http://opensource.org/licenses/Apache-2.0 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -75,6 +75,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Detector = __webpack_require__(13);
 	var Decoder = __webpack_require__(12);
+	var PureBitsExtractor = __webpack_require__(17);
 
 
 	function QrCode(image) {
@@ -110,16 +111,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    function process() {
-	        var gs = grayScaleToBitmap(grayscale());
+	        var bitmap = grayScaleToBitmap(grayscale());
 
-	        gs.width = width;
-	        gs.height = height;
-	        gs.imagedata = imageData;
-	        var detector = new Detector(gs);
+	        bitmap.width = width;
+	        bitmap.height = height;
+	        bitmap.imagedata = imageData;
 
-	        var qRCodeMatrix = detector.detect();
+	        var reader;
+	        try {
+	            var bits = PureBitsExtractor.extractPureBits(bitmap);
+	            reader = Decoder.decode(bits);
+	        } catch (e) {
+	            var detector = new Detector(bitmap);
+	            var qRCodeMatrix = detector.detect();
+	            reader = Decoder.decode(qRCodeMatrix.bits);
+	        }
 
-	        var reader = Decoder.decode(qRCodeMatrix.bits);
 	        var data = reader.getDataByte();
 	        var str = '';
 	        for (var i = 0; i < data.length; i++) {
@@ -215,6 +222,104 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*
+	 Ported to JavaScript by Lazar Laszlo 2011
+
+	 lazarsoft@gmail.com, www.lazarsoft.info
+
+	 */
+
+	/*
+	 *
+	 * Copyright 2007 ZXing authors
+	 *
+	 * Licensed under the Apache License, Version 2.0 (the "License");
+	 * you may not use this file except in compliance with the License.
+	 * You may obtain a copy of the License at
+	 *
+	 *      http://www.apache.org/licenses/LICENSE-2.0
+	 *
+	 * Unless required by applicable law or agreed to in writing, software
+	 * distributed under the License is distributed on an "AS IS" BASIS,
+	 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	 * See the License for the specific language governing permissions and
+	 * limitations under the License.
+	 */
+
+	'use strict';
+
+	var URShift = __webpack_require__(3).URShift;
+
+	function BitMatrix(width, height) {
+	    if (!height) {
+	        // noinspection JSSuspiciousNameCombination
+	        height = width;
+	    }
+	    if (width < 1 || height < 1) {
+	        throw 'Both dimensions must be greater than 0';
+	    }
+	    this.width = width;
+	    this.height = height;
+	    var rowSize = width >> 5;
+	    if ((width & 0x1f) !== 0) {
+	        rowSize++;
+	    }
+	    this.rowSize = rowSize;
+	    this.bits = new Array(rowSize * height);
+	    for (var i = 0; i < this.bits.length; i++) {
+	        this.bits[i] = 0;
+	    }
+
+	    this.getDimension = function() {
+	        if (this.width !== this.height) {
+	            throw 'Can get dimension on a non-square matrix';
+	        }
+	        return this.width;
+	    };
+
+	    this.getValue = function (x, y) {
+	        var offset = y * this.rowSize + (x >> 5);
+	        return ((URShift(this.bits[offset], (x & 0x1f))) & 1) !== 0;
+	    };
+
+	    this.setValue = function (x, y) {
+	        var offset = y * this.rowSize + (x >> 5);
+	        this.bits[offset] |= 1 << (x & 0x1f);
+	    };
+
+	    this.flip = function (x, y) {
+	        var offset = y * this.rowSize + (x >> 5);
+	        this.bits[offset] ^= 1 << (x & 0x1f);
+	    };
+
+	    this.setRegion = function (left, top, rwidth, rheight) {
+	        if (top < 0 || left < 0) {
+	            throw 'Left and top must be nonnegative';
+	        }
+	        if (rheight < 1 || rwidth < 1) {
+	            throw 'Height and width must be at least 1';
+	        }
+	        var right = left + rwidth;
+	        var bottom = top + rheight;
+	        if (bottom > this.height || right > this.width) {
+	            throw 'The region must fit inside the matrix';
+	        }
+	        for (var y = top; y < bottom; y++) {
+	            var offset = y * this.rowSize;
+	            for (var x = left; x < right; x++) {
+	                this.bits[offset + (x >> 5)] |= 1 << (x & 0x1f);
+	            }
+	        }
+	    };
+	}
+
+	module.exports = BitMatrix;
+
+
+/***/ },
+/* 2 */
 /***/ function(module, exports) {
 
 	/*
@@ -498,7 +603,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 2 */
+/* 3 */
 /***/ function(module, exports) {
 
 	/*
@@ -539,104 +644,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/*
-	 Ported to JavaScript by Lazar Laszlo 2011
-
-	 lazarsoft@gmail.com, www.lazarsoft.info
-
-	 */
-
-	/*
-	 *
-	 * Copyright 2007 ZXing authors
-	 *
-	 * Licensed under the Apache License, Version 2.0 (the "License");
-	 * you may not use this file except in compliance with the License.
-	 * You may obtain a copy of the License at
-	 *
-	 *      http://www.apache.org/licenses/LICENSE-2.0
-	 *
-	 * Unless required by applicable law or agreed to in writing, software
-	 * distributed under the License is distributed on an "AS IS" BASIS,
-	 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	 * See the License for the specific language governing permissions and
-	 * limitations under the License.
-	 */
-
-	'use strict';
-
-	var URShift = __webpack_require__(2).URShift;
-
-	function BitMatrix(width, height) {
-	    if (!height) {
-	        // noinspection JSSuspiciousNameCombination
-	        height = width;
-	    }
-	    if (width < 1 || height < 1) {
-	        throw 'Both dimensions must be greater than 0';
-	    }
-	    this.width = width;
-	    this.height = height;
-	    var rowSize = width >> 5;
-	    if ((width & 0x1f) !== 0) {
-	        rowSize++;
-	    }
-	    this.rowSize = rowSize;
-	    this.bits = new Array(rowSize * height);
-	    for (var i = 0; i < this.bits.length; i++) {
-	        this.bits[i] = 0;
-	    }
-
-	    this.getDimension = function() {
-	        if (this.width !== this.height) {
-	            throw 'Can get dimension on a non-square matrix';
-	        }
-	        return this.width;
-	    };
-
-	    this.getValue = function (x, y) {
-	        var offset = y * this.rowSize + (x >> 5);
-	        return ((URShift(this.bits[offset], (x & 0x1f))) & 1) !== 0;
-	    };
-
-	    this.setValue = function (x, y) {
-	        var offset = y * this.rowSize + (x >> 5);
-	        this.bits[offset] |= 1 << (x & 0x1f);
-	    };
-
-	    this.flip = function (x, y) {
-	        var offset = y * this.rowSize + (x >> 5);
-	        this.bits[offset] ^= 1 << (x & 0x1f);
-	    };
-
-	    this.setRegion = function (left, top, rwidth, rheight) {
-	        if (top < 0 || left < 0) {
-	            throw 'Left and top must be nonnegative';
-	        }
-	        if (rheight < 1 || rwidth < 1) {
-	            throw 'Height and width must be at least 1';
-	        }
-	        var right = left + rwidth;
-	        var bottom = top + rheight;
-	        if (bottom > this.height || right > this.width) {
-	            throw 'The region must fit inside the matrix';
-	        }
-	        for (var y = top; y < bottom; y++) {
-	            var offset = y * this.rowSize;
-	            for (var x = left; x < right; x++) {
-	                this.bits[offset + (x >> 5)] |= 1 << (x & 0x1f);
-	            }
-	        }
-	    };
-	}
-
-	module.exports = BitMatrix;
-
-
-/***/ },
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -667,7 +674,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	var ErrorCorrectionLevel = __webpack_require__(14);
-	var URShift = __webpack_require__(2).URShift;
+	var URShift = __webpack_require__(3).URShift;
 
 	var FORMAT_INFO_MASK_QR = 0x5412;
 	var FORMAT_INFO_DECODE_LOOKUP = [
@@ -887,7 +894,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var BitMatrix = __webpack_require__(3);
+	var BitMatrix = __webpack_require__(1);
 	var FormatInformation = __webpack_require__(4);
 
 	function ECB(count, dataCodewords) {
@@ -1648,7 +1655,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var URShift = __webpack_require__(2).URShift;
+	var URShift = __webpack_require__(3).URShift;
 
 	var DataMask = {};
 
@@ -1816,11 +1823,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var ReedSolomonDecoder = __webpack_require__(18);
-	var GF256 = __webpack_require__(1).GF256;
+	var ReedSolomonDecoder = __webpack_require__(19);
+	var GF256 = __webpack_require__(2).GF256;
 	var BitMatrixParser = __webpack_require__(9);
 	var DataBlock = __webpack_require__(10);
-	var QRCodeDataBlockReader = __webpack_require__(17);
+	var QRCodeDataBlockReader = __webpack_require__(18);
 
 
 	var Decoder = {};
@@ -2056,7 +2063,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                dimension--;
 	                break;
 	            case 3:
-	                throw 'Error';
+	                throw 'Error dimension';
 	        }
 	        return dimension;
 	    };
@@ -2068,7 +2075,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var alignmentAreaLeftX = Math.max(0, estAlignmentX - allowance);
 	        var alignmentAreaRightX = Math.min(image.width - 1, estAlignmentX + allowance);
 	        if (alignmentAreaRightX - alignmentAreaLeftX < overallEstModuleSize * 3) {
-	            throw 'Error';
+	            throw 'Error align';
 	        }
 
 	        var alignmentAreaTopY = Math.max(0, estAlignmentY - allowance);
@@ -2112,7 +2119,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var moduleSize = this.calculateModuleSize(topLeft, topRight, bottomLeft);
 	        if (moduleSize < 1.0) {
-	            throw 'Error';
+	            throw 'Error modSize';
 	        }
 	        var dimension = this.computeDimension(topLeft, topRight, bottomLeft, moduleSize);
 	        var provisionalVersion = Version.getProvisionalVersionForDimension(dimension);
@@ -2789,7 +2796,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var BitMatrix = __webpack_require__(3);
+	var BitMatrix = __webpack_require__(1);
 	var PerspectiveTransform = __webpack_require__(5);
 
 	var GridSampler = {};
@@ -2904,6 +2911,170 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*
+	 Copyright 2016 Antelle
+
+	 Ported from ZXing source
+
+	 Licensed under the Apache License, Version 2.0 (the "License");
+	 you may not use this file except in compliance with the License.
+	 You may obtain a copy of the License at
+
+	 http://www.apache.org/licenses/LICENSE-2.0
+
+	 Unless required by applicable law or agreed to in writing, software
+	 distributed under the License is distributed on an "AS IS" BASIS,
+	 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	 See the License for the specific language governing permissions and
+	 limitations under the License.
+	 */
+
+	'use strict';
+
+	var BitMatrix = __webpack_require__(1);
+
+	var PureBitsExtractor = {
+	    extractPureBits: function(bitmap) {
+	        var leftTopBlack = this.getTopLeftOnBit(bitmap);
+	        var rightBottomBlack = this.getBottomRightOnBit(bitmap);
+	        if (!leftTopBlack || !rightBottomBlack) {
+	            throw 'not found';
+	        }
+
+	        var moduleSize = this.getModuleSize(leftTopBlack, bitmap);
+	        if (!moduleSize) {
+	            throw 'not found';
+	        }
+
+	        var top = leftTopBlack[1];
+	        var bottom = rightBottomBlack[1];
+	        var left = leftTopBlack[0];
+	        var right = rightBottomBlack[0];
+
+	        // Sanity check!
+	        if (left >= right || top >= bottom) {
+	            throw 'not found';
+	        }
+
+	        if (bottom - top !== right - left) {
+	            // Special case, where bottom-right module wasn't black so we found something else in the last row
+	            // Assume it's a square, so use height as the width
+	            right = left + (bottom - top);
+	        }
+
+	        var matrixWidth = Math.round((right - left + 1) / moduleSize);
+	        var matrixHeight = Math.round((bottom - top + 1) / moduleSize);
+	        if (matrixWidth <= 0 || matrixHeight <= 0) {
+	            throw 'not found';
+	        }
+	        if (matrixHeight !== matrixWidth) {
+	            // Only possibly decode square regions
+	            throw 'not found';
+	        }
+
+	        // Push in the "border" by half the module width so that we start
+	        // sampling in the middle of the module. Just in case the image is a
+	        // little off, this will help recover.
+	        var nudge = Math.floor(moduleSize / 2);
+	        top += nudge;
+	        left += nudge;
+
+	        // But careful that this does not sample off the edge
+	        // "right" is the farthest-right valid pixel location -- right+1 is not necessarily
+	        // This is positive by how much the inner x loop below would be too large
+	        var nudgedTooFarRight = left + (matrixWidth - 1) * moduleSize - right;
+	        if (nudgedTooFarRight > 0) {
+	            if (nudgedTooFarRight > nudge) {
+	                // Neither way fits; abort
+	                throw 'not found';
+	            }
+	            left -= nudgedTooFarRight;
+	        }
+	        // See logic above
+	        var nudgedTooFarDown = top + (matrixHeight - 1) * moduleSize - bottom;
+	        if (nudgedTooFarDown > 0) {
+	            if (nudgedTooFarDown > nudge) {
+	                // Neither way fits; abort
+	                throw 'not found';
+	            }
+	            top -= nudgedTooFarDown;
+	        }
+
+	        // Now just read off the bits
+	        var width = bitmap.width;
+	        var bits = new BitMatrix(matrixWidth, matrixHeight);
+	        for (var y = 0; y < matrixHeight; y++) {
+	            var iOffset = top + y * moduleSize;
+	            for (var x = 0; x < matrixWidth; x++) {
+	                if (bitmap[left + x * moduleSize + iOffset * width]) {
+	                    bits.setValue(x, y);
+	                }
+	            }
+	        }
+	        return bits;
+	    },
+
+	    getModuleSize: function(leftTopBlack, bitmap) {
+	        var height = bitmap.height;
+	        var width = bitmap.width;
+	        var x = leftTopBlack[0];
+	        var y = leftTopBlack[1];
+	        var inBlack = 1;
+	        var transitions = 0;
+	        while (x < width && y < height) {
+	            if (inBlack !== bitmap[x + y * width]) {
+	                if (++transitions === 5) {
+	                    break;
+	                }
+	                inBlack = inBlack ? 0 : 1;
+	            }
+	            x++;
+	            y++;
+	        }
+	        if (x === width || y === height) {
+	            return null;
+	        }
+	        return (x - leftTopBlack[0]) / 7.0;
+	    },
+
+	    getTopLeftOnBit: function(bitmap) {
+	        var bitsOffset = 0;
+	        while (bitsOffset < bitmap.length && bitmap[bitsOffset] === 0) {
+	            bitsOffset++;
+	        }
+	        if (bitsOffset === bitmap.length) {
+	            throw 'not found';
+	        }
+
+	        var x = bitsOffset % bitmap.width;
+	        var y = Math.floor(bitsOffset / bitmap.width);
+
+	        return [x, y];
+	    },
+
+	    getBottomRightOnBit: function(bitmap) {
+	        var bitsOffset = bitmap.length - 1;
+	        while (bitsOffset >= 0 && bitmap[bitsOffset] === 0) {
+	            bitsOffset--;
+	        }
+	        if (bitsOffset < 0) {
+	            throw 'not found';
+	        }
+
+	        var x = bitsOffset % bitmap.width;
+	        var y = Math.floor(bitsOffset / bitmap.width);
+
+	        return [x, y];
+	    }
+	};
+
+	module.exports = PureBitsExtractor;
+
+
+/***/ },
+/* 18 */
 /***/ function(module, exports) {
 
 	/*
@@ -3211,7 +3382,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -3240,8 +3411,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var GF256 = __webpack_require__(1).GF256;
-	var GF256Poly = __webpack_require__(1).GF256Poly;
+	var GF256 = __webpack_require__(2).GF256;
+	var GF256Poly = __webpack_require__(2).GF256Poly;
 
 	function ReedSolomonDecoder(field) {
 	    this.field = field;
