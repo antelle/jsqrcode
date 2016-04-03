@@ -1,4 +1,4 @@
-/*! jsqrcode v0.1.2, (c) 2016 Antelle, fork of https://github.com/LazarSoft/jsqrcode, port of http://code.google.com/p/zxing, http://opensource.org/licenses/Apache-2.0 */
+/*! jsqrcode v0.1.3, (c) 2016 Antelle, fork of https://github.com/LazarSoft/jsqrcode, port of http://code.google.com/p/zxing, http://opensource.org/licenses/Apache-2.0 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -267,10 +267,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        rowSize++;
 	    }
 	    this.rowSize = rowSize;
-	    this.bits = new Array(rowSize * height);
-	    for (var i = 0; i < this.bits.length; i++) {
-	        this.bits[i] = 0;
-	    }
+	    this.bits = new Uint32Array(rowSize * height);
 
 	    this.getDimension = function() {
 	        if (this.width !== this.height) {
