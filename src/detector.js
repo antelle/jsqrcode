@@ -162,7 +162,7 @@ function Detector(image) {
                 dimension--;
                 break;
             case 3:
-                throw 'Error';
+                throw 'Error dimension';
         }
         return dimension;
     };
@@ -174,7 +174,7 @@ function Detector(image) {
         var alignmentAreaLeftX = Math.max(0, estAlignmentX - allowance);
         var alignmentAreaRightX = Math.min(image.width - 1, estAlignmentX + allowance);
         if (alignmentAreaRightX - alignmentAreaLeftX < overallEstModuleSize * 3) {
-            throw 'Error';
+            throw 'Error align';
         }
 
         var alignmentAreaTopY = Math.max(0, estAlignmentY - allowance);
@@ -218,7 +218,7 @@ function Detector(image) {
 
         var moduleSize = this.calculateModuleSize(topLeft, topRight, bottomLeft);
         if (moduleSize < 1.0) {
-            throw 'Error';
+            throw 'Error modSize';
         }
         var dimension = this.computeDimension(topLeft, topRight, bottomLeft, moduleSize);
         var provisionalVersion = Version.getProvisionalVersionForDimension(dimension);

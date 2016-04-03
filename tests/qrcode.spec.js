@@ -65,6 +65,10 @@ describe('QrCode', function() {
         testCode('totp-github.png', 'otpauth://totp/github.com/NewSecureCat?issuer=GitHub&secret=7xqddgdjxkmpju4f', done);
     });
 
+    it('Parses totp-ms QrCode', function(done) {
+        testCode('totp-ms.png', 'otpauth://totp/Microsoft:dmitryvit@gmail.com?secret=NP24DZANKYQAGZQG&issuer=Microsoft', done);
+    });
+
     function testCode(imgName, exp, done) {
         var img = new Image();
         img.src = 'img/' + imgName + (imgName.indexOf('.') < 0 ? '.jpg' : '');

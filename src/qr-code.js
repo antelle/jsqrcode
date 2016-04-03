@@ -18,6 +18,7 @@
 
 var Detector = require('./detector');
 var Decoder = require('./decoder');
+var PureBitsExtractor = require('./pure-bits-extractor');
 
 
 function QrCode(image) {
@@ -53,16 +54,22 @@ function QrCode(image) {
     };
 
     function process() {
-        var gs = grayScaleToBitmap(grayscale());
+        var bitmap = grayScaleToBitmap(grayscale());
 
-        gs.width = width;
-        gs.height = height;
-        gs.imagedata = imageData;
-        var detector = new Detector(gs);
+        bitmap.width = width;
+        bitmap.height = height;
+        bitmap.imagedata = imageData;
 
-        var qRCodeMatrix = detector.detect();
+        var reader;
+        try {
+            var bits = PureBitsExtractor.extractPureBits(bitmap);
+            reader = Decoder.decode(bits);
+        } catch (e) {
+            var detector = new Detector(bitmap);
+            var qRCodeMatrix = detector.detect();
+            reader = Decoder.decode(qRCodeMatrix.bits);
+        }
 
-        var reader = Decoder.decode(qRCodeMatrix.bits);
         var data = reader.getDataByte();
         var str = '';
         for (var i = 0; i < data.length; i++) {
