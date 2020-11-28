@@ -1,0 +1,17 @@
+name: CI Checks
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: NPM install
+        run: npm ci
+      - name: Build
+        run: npm start
